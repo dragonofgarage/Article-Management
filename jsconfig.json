@@ -1,0 +1,10 @@
+//Let vscode Identify @ path and give a notice
+
+{
+  "compilerOptions": {
+    "baseUrl": "./",
+    "paths": {
+      "@/*": ["src/*"]
+    }
+  }
+}
