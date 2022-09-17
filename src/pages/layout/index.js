@@ -1,9 +1,77 @@
-const Layout = () => {
-  return(
-    <div>
-      Layout
-    </div>
+import { Layout, Menu, Popconfirm } from 'antd'
+import {
+  HomeOutlined,
+  DiffOutlined,
+  EditOutlined,
+  LogoutOutlined
+} from '@ant-design/icons'
+import './index.scss'
+import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom'
+import { useEffect } from 'react'
+import { useStore } from '@/store'
+import { observer } from 'mobx-react-lite'
+
+const { Header, Sider } = Layout
+
+const ArticleLayout = () => {
+  const { pathname } = useLocation()
+
+  //Get the info of user
+  const { userStore } = useStore()
+
+  useEffect(() => {
+    try{
+      userStore.getUserInfo()
+    } catch {}
+  }, [userStore])
+
+  const { loginStore } = useStore()
+  const navigate = useNavigate()
+  const handleLogOut = () => {
+    loginStore.logOut()
+    navigate('/login')
+  }
+
+  return (
+    <Layout>
+      <Header className="header">
+        <div className="logo">Article Manage System</div> 
+        <div className="user-info">
+          <span className="user-name">{userStore.userInfo.mobile}</span>
+          <span className="user-logout">
+            <Popconfirm
+              onConfirm={handleLogOut}
+              title="Confirm Exit？" okText="Exit" cancelText="Cancel">
+              <LogoutOutlined /> Exit
+            </Popconfirm>
+          </span>
+        </div>
+      </Header>
+      <Layout>
+        <Sider width={200} className="site-layout-background">
+          <Menu
+            mode="inline"
+            theme="dark"
+            defaultSelectedKeys={[pathname]}
+            style={{ height: '100%', borderRight: 0 }}
+          >
+            <Menu.Item icon={<HomeOutlined />} key="/">
+              <Link to='/'>Data Overview</Link>
+            </Menu.Item>
+            <Menu.Item icon={<DiffOutlined />} key="/article">
+              <Link to='/article'>Content Manage</Link>
+            </Menu.Item>
+            <Menu.Item icon={<EditOutlined />} key="/publish">
+              <Link to='/publish'>Publish Article</Link>
+            </Menu.Item>
+          </Menu>
+        </Sider>
+        <Layout className="layout-content" style={{ padding: 20 }}>
+          <Outlet />
+        </Layout>
+      </Layout>
+    </Layout>
   )
 }
 
-export default Layout;
+export default observer(ArticleLayout);
